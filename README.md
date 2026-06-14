@@ -30,6 +30,26 @@ docker run --rm -p 5000:5000 -v /path/to/files:/data dufs-tabler-web \
   -p 5000
 ```
 
+Docker Compose 方式：
+
+```bash
+docker compose up --build
+```
+
+默认访问 `http://127.0.0.1:5050`，挂载当前目录。可以通过环境变量指定目录和端口：
+
+```bash
+DUFS_DATA=/path/to/files DUFS_PORT=5000 docker compose up --build
+```
+
+Compose 认证模式：
+
+```bash
+DUFS_DATA=/path/to/files docker compose --profile auth up --build dufs-auth
+```
+
+认证模式默认访问 `http://127.0.0.1:5051`，账号密码为 `admin/admin`。
+
 更细粒度的权限示例：
 
 ```bash
@@ -59,3 +79,4 @@ dufs /path/to/files \
 - `assets/index.js`：dufs API 适配与界面交互。
 - `assets/favicon.svg`：本地图标。
 - `Dockerfile`：基于 `sigoden/dufs` 打包本地 UI 资源，默认服务 `/data`。
+- `docker-compose.yml`：本地构建并运行 dufs，包含默认服务和认证 profile。

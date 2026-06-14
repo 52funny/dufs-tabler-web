@@ -1,0 +1,24 @@
+services:
+  dufs:
+    build:
+      context: .
+    image: ${DUFS_IMAGE:-dufs-tabler-web}
+    ports:
+      - "${DUFS_PORT:-5051}:5000"
+    volumes:
+      - "${DUFS_DATA:-.}:/data"
+    command:
+      - /data
+      - --assets
+      - /assets
+      - --allow-upload
+      - --allow-delete
+      - --allow-search
+      - --allow-archive
+      - -a
+      - "${DUFS_AUTH:-admin:admin@/:rw}"
+      - -b
+      - 0.0.0.0
+      - -p
+      - "5000"
+    restart: unless-stopped
