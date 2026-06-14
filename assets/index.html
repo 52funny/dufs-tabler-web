@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <noscript>
+    <meta http-equiv="refresh" content="0; url=?noscript">
+  </noscript>
+  <title>Dufs Web</title>
+  <link rel="icon" type="image/svg+xml" href="__ASSETS_PREFIX__favicon.svg?v=tabler-11">
+  <link rel="stylesheet" href="__ASSETS_PREFIX__tabler.min.css?v=tabler-11">
+  <link rel="stylesheet" href="__ASSETS_PREFIX__index.css?v=tabler-11">
+</head>
+<body>
+  <div class="page">
+    <header class="navbar">
+      <div class="container-xl navbar-row">
+        <a class="navbar-brand" href="/" data-home-link>
+          <span class="avatar avatar-sm bg-primary text-white">D</span>
+          <span>Dufs</span>
+        </a>
+
+        <div class="navbar-tools">
+          <button class="btn btn-outline-secondary upload-queue-button" type="button" title="上传队列">
+            <span data-icon="upload"></span>
+            <span>上传队列</span>
+            <span class="badge bg-primary hidden" data-upload-count>0</span>
+          </button>
+          <button class="btn btn-icon btn-outline-secondary login-btn hidden" type="button" title="登录" aria-label="登录">
+            <span data-icon="login"></span>
+          </button>
+          <button class="btn btn-outline-secondary logout-btn hidden" type="button" title="登出">
+            <span data-icon="logout"></span>
+            <span class="user-name"></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="page-wrapper">
+      <div class="container-xl">
+        <div class="page-header">
+          <div class="path-zone">
+            <div class="breadcrumb" aria-label="当前位置"></div>
+            <p class="path-subtitle" data-path-summary>准备就绪</p>
+          </div>
+
+          <form class="input-icon searchbar hidden" role="search">
+            <span class="input-icon-addon" data-icon="search"></span>
+            <input id="search" class="form-control" name="q" type="search" maxlength="128" autocomplete="off" placeholder="搜索文件或文件夹">
+          </form>
+        </div>
+
+        <section class="card toolbar index-only hidden" aria-label="文件操作">
+          <div class="toolbar-group">
+            <button class="btn btn-primary primary-button upload-file hidden" type="button">
+              <span data-icon="upload"></span>
+              <span>上传</span>
+            </button>
+            <input id="file" type="file" multiple hidden>
+            <button class="btn btn-outline-secondary tool-button upload-folder hidden" type="button">
+              <span data-icon="folder-up"></span>
+              <span>上传文件夹</span>
+            </button>
+            <input id="folder" type="file" webkitdirectory directory multiple hidden>
+            <button class="btn btn-icon btn-outline-secondary tool-button new-folder hidden" type="button" title="新建文件夹">
+              <span data-icon="folder-plus"></span>
+            </button>
+            <button class="btn btn-icon btn-outline-secondary tool-button new-file hidden" type="button" title="新建文件">
+              <span data-icon="file-plus"></span>
+            </button>
+          </div>
+
+          <div class="toolbar-group">
+            <button class="btn btn-icon btn-outline-secondary tool-button download-current hidden" type="button" title="打包下载当前目录">
+              <span data-icon="archive"></span>
+            </button>
+            <button class="btn btn-icon btn-outline-secondary tool-button batch-download" type="button" title="下载选中项" disabled>
+              <span data-icon="download"></span>
+            </button>
+            <button class="btn btn-icon btn-outline-danger danger-button batch-delete hidden" type="button" title="删除选中项" disabled>
+              <span data-icon="trash"></span>
+            </button>
+          </div>
+
+          <div class="toolbar-group toolbar-right">
+            <div class="sort-menu" data-sort-menu>
+              <button class="btn btn-outline-secondary sort-menu-button" type="button" aria-haspopup="menu" aria-expanded="false">
+                <span data-icon="sort"></span>
+                <span data-sort-label>智能排序</span>
+                <span data-icon="chevron-down"></span>
+              </button>
+              <div class="sort-menu-list hidden" role="menu">
+                <button class="sort-menu-item" type="button" role="menuitemradio" data-sort-value="smart">智能排序</button>
+                <button class="sort-menu-item" type="button" role="menuitemradio" data-sort-value="name">名称</button>
+                <button class="sort-menu-item" type="button" role="menuitemradio" data-sort-value="mtime">修改时间</button>
+                <button class="sort-menu-item" type="button" role="menuitemradio" data-sort-value="size">大小</button>
+                <button class="sort-menu-item" type="button" role="menuitemradio" data-sort-value="type">类型</button>
+              </div>
+            </div>
+            <button class="btn btn-icon btn-outline-secondary tool-button sort-order" type="button" title="切换升降序" aria-label="切换升降序">
+              <span data-icon="arrow-down"></span>
+            </button>
+            <div class="btn-group segmented" role="group" aria-label="视图">
+              <button class="btn btn-icon view-toggle active" type="button" data-view="list" title="列表视图" aria-label="列表视图">
+                <span data-icon="list"></span>
+              </button>
+              <button class="btn btn-icon view-toggle" type="button" data-view="grid" title="网格视图" aria-label="网格视图">
+                <span data-icon="grid"></span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="alert selection-bar hidden index-only" aria-live="polite">
+          <span><strong data-selected-count>0</strong> 项已选择</span>
+          <button class="btn btn-link link-button clear-selection" type="button">清除选择</button>
+        </section>
+
+        <section class="card uploads-panel hidden" data-upload-panel>
+          <div class="card-header">
+            <h2 class="card-title">上传队列</h2>
+            <button class="btn btn-link link-button clear-completed" type="button">清除已完成</button>
+          </div>
+          <div class="card-body upload-list" data-upload-list></div>
+        </section>
+
+        <section class="card index-page hidden">
+          <div class="empty-state hidden">
+            <span data-icon="folder-open"></span>
+            <strong data-empty-title>暂无文件</strong>
+            <small data-empty-note>可以通过拖拽或上传按钮添加文件</small>
+          </div>
+
+          <div class="list-view table-responsive" data-view-panel="list">
+            <table class="table file-table">
+              <thead>
+                <tr>
+                  <th class="select-cell">
+                    <input class="form-check-input select-all" type="checkbox" aria-label="全选">
+                  </th>
+                  <th>名称</th>
+                  <th>类型</th>
+                  <th>修改时间</th>
+                  <th class="number-cell">大小</th>
+                  <th class="actions-cell">操作</th>
+                </tr>
+              </thead>
+              <tbody data-file-list></tbody>
+            </table>
+          </div>
+
+          <div class="grid-view hidden" data-view-panel="grid">
+            <div class="file-grid" data-file-grid></div>
+          </div>
+        </section>
+
+        <section class="card editor-page hidden">
+          <div class="card-header editor-toolbar">
+            <div class="file-heading">
+              <span data-editor-icon></span>
+              <div>
+                <h1 data-editor-title>文件预览</h1>
+                <p data-editor-meta></p>
+              </div>
+            </div>
+            <div class="toolbar-group">
+              <button class="btn btn-icon btn-outline-secondary tool-button download-file" type="button" title="流式下载">
+                <span data-icon="download"></span>
+              </button>
+              <button class="btn btn-icon btn-outline-secondary tool-button move-file hidden" type="button" title="移动或重命名">
+                <span data-icon="move"></span>
+              </button>
+              <button class="btn btn-icon btn-outline-danger danger-button delete-file hidden" type="button" title="删除">
+                <span data-icon="trash"></span>
+              </button>
+              <button class="btn btn-primary primary-button save-btn hidden" type="button">
+                <span data-icon="save"></span>
+                <span>保存</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="tabs preview-tabs hidden" role="tablist">
+            <button class="tab preview-tab active" type="button" data-preview-mode="edit">编辑</button>
+            <button class="tab preview-tab" type="button" data-preview-mode="preview">预览</button>
+          </div>
+
+          <div class="card-body viewer">
+            <div class="not-editable hidden"></div>
+            <textarea id="editor" class="form-control editor hidden" spellcheck="false" aria-label="文件编辑器"></textarea>
+            <div class="preview-pane hidden" data-preview-pane></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <template id="index-data">__INDEX_DATA__</template>
+  <script src="__ASSETS_PREFIX__index.js?v=tabler-11"></script>
+</body>
+</html>
