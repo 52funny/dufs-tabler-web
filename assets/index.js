@@ -68,7 +68,6 @@ let PARAMS;
 let state;
 let collator;
 let uploadManager;
-const accessUrlCache = new Map();
 
 document.addEventListener("DOMContentLoaded", () => {
   renderStaticIcons();
@@ -213,6 +212,19 @@ function setupEditorPage() {
   document.querySelector("[data-editor-meta]").textContent = DATA.kind === "Edit" ? "编辑模式" : "预览模式";
   document.querySelector("[data-editor-icon]").innerHTML = fileIconSvg(ext, false);
   document.querySelector(".download-file").addEventListener("click", () => downloadUrl(url, fileName));
+  document.querySelector(".copy-file-link").addEventListener("click", async (event) => {
+    try {
+      await copyDirectLink(url);
+      markCopied(event.currentTarget);
+    } catch (err) {
+      alert(`复制失败：${err.message}`);
+    }
+  });
+  if (isMediaExt(ext)) {
+    const openPlayerButton = document.querySelector(".open-player-file");
+    openPlayerButton.classList.remove("hidden");
+    setupExternalPlayerMenu(openPlayerButton, url, fileName);
+  }
 
   if (DATA.kind === "Edit") {
     document.querySelector(".move-file").classList.remove("hidden");
@@ -572,7 +584,6 @@ function renderFiles() {
   document.querySelector("[data-empty-title]").textContent = PARAMS.q ? "没有搜索结果" : DATA.dir_exists ? "空文件夹" : "上传时会自动创建文件夹";
   document.querySelector("[data-path-summary]").textContent = summarizeFiles(files);
   updateSelectionUI();
-  hydrateAccessLinks();
 }
 
 function renderFileRow(file) {
@@ -793,8 +804,128 @@ async function downloadUrl(url, name) {
 }
 
 async function copyDirectLink(url) {
-  const finalUrl = await withAccessToken(url);
+  const finalUrl = await directAccessUrl(url);
   await copyText(finalUrl);
+}
+
+function setupExternalPlayerMenu(button, url, fileName) {
+  const menu = el("div", { class: "player-menu-list hidden", role: "menu" });
+  const items = [
+    ["IINA 打开（macOS）", "play", () => openPlayerScheme(url, "iina")],
+    ["VLC 协议打开", "play", () => openPlayerScheme(url, "vlc")],
+    ["PotPlayer 打开（Windows）", "play", () => openPlayerScheme(url, "potplayer")],
+    ["下载 M3U 播放列表", "download", () => downloadPlaylist(url, fileName)],
+    ["复制 mpv 命令", "copy", () => copyPlayerCommand(url, "mpv")],
+    ["复制 VLC 命令", "copy", () => copyPlayerCommand(url, "vlc")],
+    ["复制直链", "copy", () => copyDirectLink(url)],
+  ];
+  items.forEach(([label, icon, handler]) => {
+    const item = el("button", { class: "player-menu-item", type: "button", role: "menuitem" }, iconSvg(icon), el("span", {}, label));
+    item.addEventListener("click", async () => {
+      closePlayerMenu(button, menu);
+      try {
+        await handler();
+        if (/复制/.test(label)) markMenuItemCopied(button);
+      } catch (err) {
+        alert(`${label}失败：${err.message}`);
+      }
+    });
+    menu.append(item);
+  });
+  document.body.append(menu);
+
+  button.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const open = menu.classList.contains("hidden");
+    renderPlayerMenu(button, menu, open);
+  });
+  document.addEventListener("click", (event) => {
+    if (event.target !== button && !menu.contains(event.target)) closePlayerMenu(button, menu);
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closePlayerMenu(button, menu);
+  });
+  window.addEventListener("resize", () => closePlayerMenu(button, menu));
+  window.addEventListener("scroll", () => closePlayerMenu(button, menu), true);
+}
+
+function directFileUrl(url) {
+  const targetUrl = new URL(url, location.href);
+  targetUrl.searchParams.delete("view");
+  targetUrl.searchParams.delete("edit");
+  targetUrl.searchParams.delete("noscript");
+  targetUrl.searchParams.delete("tokengen");
+  return targetUrl.toString();
+}
+
+async function directAccessUrl(url) {
+  return withAccessToken(directFileUrl(url));
+}
+
+function renderPlayerMenu(button, menu, open) {
+  button.setAttribute("aria-expanded", String(Boolean(open)));
+  menu.classList.toggle("hidden", !open);
+  if (open) positionPlayerMenu(button, menu);
+}
+
+function closePlayerMenu(button, menu) {
+  renderPlayerMenu(button, menu, false);
+}
+
+function positionPlayerMenu(button, menu) {
+  const rect = button.getBoundingClientRect();
+  const viewportWidth = document.documentElement.clientWidth;
+  const width = Math.max(238, rect.width);
+  const left = Math.min(Math.max(rect.right - width, 8), Math.max(viewportWidth - width - 8, 8));
+  menu.style.width = `${width}px`;
+  menu.style.left = `${left}px`;
+  menu.style.top = `${rect.bottom + 6}px`;
+}
+
+async function openPlayerScheme(url, player) {
+  const finalUrl = await directAccessUrl(url);
+  const schemes = {
+    iina: `iina://weblink?url=${encodeURIComponent(finalUrl)}`,
+    vlc: `vlc://${finalUrl}`,
+    potplayer: `potplayer://${finalUrl}`,
+  };
+  location.href = schemes[player];
+}
+
+async function copyPlayerCommand(url, player) {
+  const finalUrl = await directAccessUrl(url);
+  await copyText(`${player} ${quoteCommandArg(finalUrl)}`);
+}
+
+async function downloadPlaylist(url, fileName) {
+  const finalUrl = await directAccessUrl(url);
+  const content = `#EXTM3U\n#EXTINF:-1,${fileName || "media"}\n${finalUrl}\n`;
+  const objectUrl = URL.createObjectURL(new Blob([content], { type: "audio/x-mpegurl" }));
+  const anchor = document.createElement("a");
+  anchor.href = objectUrl;
+  anchor.download = `${safePlaylistName(fileName)}.m3u8`;
+  document.body.append(anchor);
+  anchor.click();
+  anchor.remove();
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+}
+
+function quoteCommandArg(value) {
+  return `"${String(value).replace(/(["\\])/g, "\\$1")}"`;
+}
+
+function safePlaylistName(fileName) {
+  return (fileName || "media").replace(/[\\/:*?"<>|]+/g, "_");
+}
+
+function markMenuItemCopied(button) {
+  const title = button.title;
+  button.title = "已复制";
+  button.setAttribute("aria-label", "已复制");
+  window.setTimeout(() => {
+    button.title = title;
+    button.setAttribute("aria-label", title);
+  }, 1400);
 }
 
 async function copyText(text) {
@@ -1098,7 +1229,6 @@ function fileLink(file, url, isDir) {
     ? withInheritedToken(`${url}/`)
     : withInheritedToken(urlWithParams(url, { view: "" }));
   const link = el("a", { href: accessHref, title: file.name }, file.name);
-  link.dataset.accessHref = isDir ? `${url}/` : urlWithParams(url, { view: "" });
   if (!isDir) {
     link.target = "_blank";
     link.addEventListener("click", (event) => {
@@ -1108,34 +1238,6 @@ function fileLink(file, url, isDir) {
     });
   }
   return link;
-}
-
-function hydrateAccessLinks() {
-  if (!DATA.user || currentAccessToken()) return;
-  document.querySelectorAll("a[data-access-href]").forEach((link) => {
-    updateAccessLink(link);
-  });
-}
-
-async function updateAccessLink(link) {
-  const href = link.dataset.accessHref;
-  if (!href) return;
-  try {
-    link.href = await cachedAccessUrl(href);
-  } catch {
-    /* Keep the original href. The click handler can still request auth/token. */
-  }
-}
-
-async function cachedAccessUrl(url) {
-  const key = new URL(url, location.href).toString();
-  if (!accessUrlCache.has(key)) {
-    accessUrlCache.set(key, withAccessToken(key).catch((err) => {
-      accessUrlCache.delete(key);
-      throw err;
-    }));
-  }
-  return accessUrlCache.get(key);
 }
 
 function iconNode(file, large = false) {
@@ -1150,6 +1252,10 @@ function fileIconSvg(ext, isDir) {
   if (VIDEO_EXTS.has(ext)) return ICONS.video;
   if (AUDIO_EXTS.has(ext)) return ICONS.music;
   return ICONS.file;
+}
+
+function isMediaExt(ext) {
+  return VIDEO_EXTS.has(ext) || AUDIO_EXTS.has(ext);
 }
 
 function iconButton(icon, title, handler, danger = false) {

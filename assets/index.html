@@ -7,9 +7,9 @@
     <meta http-equiv="refresh" content="0; url=?noscript">
   </noscript>
   <title>Dufs Web</title>
-  <link rel="icon" type="image/svg+xml" href="__ASSETS_PREFIX__favicon.svg?v=tabler-11">
-  <link rel="stylesheet" href="__ASSETS_PREFIX__tabler.min.css?v=tabler-11">
-  <link rel="stylesheet" href="__ASSETS_PREFIX__index.css?v=tabler-11">
+  <link rel="icon" type="image/svg+xml" href="__ASSETS_PREFIX__favicon.svg">
+  <link rel="stylesheet" href="__ASSETS_PREFIX__tabler.min.css">
+  <link rel="stylesheet" href="__ASSETS_PREFIX__index.css">
 </head>
 <body>
   <div class="page">
@@ -168,6 +168,12 @@
               <button class="btn btn-icon btn-outline-secondary tool-button download-file" type="button" title="流式下载">
                 <span data-icon="download"></span>
               </button>
+              <button class="btn btn-icon btn-outline-secondary tool-button copy-file-link" type="button" title="复制直链">
+                <span data-icon="copy"></span>
+              </button>
+              <button class="btn btn-icon btn-outline-secondary tool-button open-player-file hidden" type="button" title="外部播放器" aria-haspopup="menu" aria-expanded="false">
+                <span data-icon="play"></span>
+              </button>
               <button class="btn btn-icon btn-outline-secondary tool-button move-file hidden" type="button" title="移动或重命名">
                 <span data-icon="move"></span>
               </button>
@@ -197,6 +203,6 @@
   </div>
 
   <template id="index-data">__INDEX_DATA__</template>
-  <script src="__ASSETS_PREFIX__index.js?v=tabler-11"></script>
+  <script src="__ASSETS_PREFIX__index.js"></script>
 </body>
 </html>

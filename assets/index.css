@@ -138,7 +138,8 @@
   text-align: left;
 }
 
-.sort-menu-list {
+.sort-menu-list,
+.player-menu-list {
   position: fixed;
   z-index: 30;
   top: 0;
@@ -151,9 +152,15 @@
   box-shadow: 0 10px 26px rgba(15, 23, 42, 0.16);
 }
 
-.sort-menu-item {
+.player-menu-list {
+  min-width: 238px;
+}
+
+.sort-menu-item,
+.player-menu-item {
   display: flex;
   align-items: center;
+  gap: 8px;
   width: 100%;
   min-height: 34px;
   padding: 0 10px;
@@ -166,8 +173,14 @@
   white-space: nowrap;
 }
 
+.player-menu-item svg {
+  width: 17px;
+  height: 17px;
+}
+
 .sort-menu-item:hover,
-.sort-menu-item.active {
+.sort-menu-item.active,
+.player-menu-item:hover {
   color: var(--primary);
   background: var(--surface-subtle);
 }
