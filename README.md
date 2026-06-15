@@ -15,6 +15,15 @@ docker build -t dufs-tabler-web .
 docker run --rm -p 5000:5000 -v /path/to/files:/data dufs-tabler-web
 ```
 
+Docker 构建时会先压缩 `assets/` 下的 HTML、CSS、JS，并把压缩结果打包进镜像的 `/assets`。本地源码目录 `assets/` 不会被覆盖；如需查看压缩产物，可以运行：
+
+```bash
+npm install
+npm run build:assets
+```
+
+压缩结果会输出到 `dist/assets/`。
+
 Docker 认证示例：
 
 ```bash
@@ -78,5 +87,6 @@ dufs /path/to/files \
 - `assets/index.css`：文件管理器业务样式。
 - `assets/index.js`：dufs API 适配与界面交互。
 - `assets/favicon.svg`：本地图标。
+- `dist/assets/`：本地构建生成的压缩产物，不提交到仓库。
 - `Dockerfile`：基于 `sigoden/dufs` 打包本地 UI 资源，默认服务 `/data`。
 - `docker-compose.yml`：本地构建并运行 dufs，包含默认服务和认证 profile。

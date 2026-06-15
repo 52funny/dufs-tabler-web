@@ -1,0 +1,13 @@
+{
+  "name": "dufs-tabler-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build:assets": "node scripts/build-assets.mjs",
+    "check": "node --check assets/index.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1",
+    "html-minifier-terser": "^7.2.0"
+  }
+}

@@ -8,13 +8,14 @@ IMAGE ?= dufs-tabler-web
 DOCKER_PORT ?= 5050
 DOCKER_ROOT ?= $(CURDIR)
 
-.PHONY: help check scan test serve serve-ro serve-auth smoke docker-build docker-run docker-run-auth clean
+.PHONY: help check scan test build-assets serve serve-ro serve-auth smoke docker-build docker-run docker-run-auth clean
 
 help:
 	@echo "Targets:"
 	@echo "  make check       Check JavaScript syntax"
 	@echo "  make scan        Scan local assets for remote resource references"
 	@echo "  make test        Run check and scan"
+	@echo "  make build-assets Minify assets into dist/assets"
 	@echo "  make serve       Run dufs with all permissions"
 	@echo "  make serve-ro    Run dufs in read-only mode"
 	@echo "  make serve-auth  Run dufs with basic auth; default admin/admin"
@@ -28,12 +29,15 @@ help:
 	@echo "  IMAGE=$(IMAGE) DOCKER_PORT=$(DOCKER_PORT) DOCKER_ROOT=$(DOCKER_ROOT)"
 
 check:
-	node --check assets/index.js
+	npm run check
 
 scan:
 	@! rg -n "(src|href)=['\"]https?://|@import|url\(['\"]?https?://|//cdn|unpkg|jsdelivr|googleapis|gstatic" assets
 
 test: check scan
+
+build-assets:
+	npm run build:assets
 
 serve:
 	$(DUFS) $(ROOT) -A --assets $(ASSETS) -b $(HOST) -p $(PORT)
@@ -71,3 +75,4 @@ docker-run-auth:
 
 clean:
 	@find . -name ".DS_Store" -delete
+	@rm -rf dist

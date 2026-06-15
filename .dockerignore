@@ -1,5 +1,8 @@
 *
 !assets/
 !assets/**
+!scripts/
+!scripts/**
+!package.json
+!package-lock.json
 !Dockerfile
-!README.md
