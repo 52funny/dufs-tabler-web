@@ -25,6 +25,7 @@ const SORT_LABELS = {
   size: "大小",
   type: "类型",
 };
+const THEME_STORAGE_KEY = "dufs-theme";
 
 const ICONS = {
   archive: paths("M21 8v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8", "M10 12h4", "M3 8l2.5-5h13L21 8Z"),
@@ -50,12 +51,14 @@ const ICONS = {
   logout: paths("M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4", "M16 17l5-5-5-5", "M21 12H9"),
   move: paths("M5 9V5a2 2 0 0 1 2-2h9l3 3v13a2 2 0 0 1-2 2h-4", "M9 18H3", "m6 15-3 3 3 3"),
   music: paths("M9 18V5l12-2v13", "M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z", "M21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"),
+  moon: paths("M12 3a6 6 0 0 0 9 7.7A9 9 0 1 1 12 3Z"),
   pause: paths("M10 4H6v16h4V4Z", "M18 4h-4v16h4V4Z"),
   play: paths("M5 3l14 9-14 9V3Z"),
   refresh: paths("M21 12a9 9 0 0 0-15.5-6.3L3 8", "M3 3v5h5", "M3 12a9 9 0 0 0 15.5 6.3L21 16", "M16 16h5v5"),
   save: paths("M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z", "M17 21v-8H7v8", "M7 3v5h8"),
   search: paths("M10 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z", "m21 21-5-5"),
   sort: paths("M3 7h18", "M6 12h12", "M10 17h4"),
+  sun: paths("M12 4V2", "M12 22v-2", "m4.93 4.93-1.41-1.41", "m20.48 20.48-1.41-1.41", "M4 12H2", "M22 12h-2", "m4.93 19.07-1.41 1.41", "m20.48 3.52-1.41 1.41", "M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z"),
   trash: paths("M3 6h18", "M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2", "M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6", "M10 11v6", "M14 11v6"),
   upload: paths("M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4", "M17 8l-5-5-5 5", "M12 3v12"),
   "upload-cloud": paths("M16 16l-4-4-4 4", "M12 12v9", "M20 16.6A5 5 0 0 0 18 7h-1.3A8 8 0 1 0 4 15.3"),
@@ -70,6 +73,7 @@ let collator;
 let uploadManager;
 
 document.addEventListener("DOMContentLoaded", () => {
+  setupThemeToggle();
   renderStaticIcons();
   try {
     DATA = readDufsData();
@@ -1144,6 +1148,56 @@ function setPreviewMode(mode, ext) {
 function renderSortOrder() {
   const icon = state.order === "asc" ? "arrow-up" : "arrow-down";
   document.querySelector(".sort-order").replaceChildren(iconSvg(icon));
+}
+
+function setupThemeToggle() {
+  applyStoredTheme();
+  renderThemeToggle();
+  document.querySelector(".theme-toggle")?.addEventListener("click", () => {
+    const next = resolvedTheme() === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, next);
+    } catch {
+      /* Theme still applies for the current page. */
+    }
+    renderThemeToggle();
+  });
+  const themeMedia = window.matchMedia?.("(prefers-color-scheme: dark)");
+  themeMedia?.addEventListener?.("change", () => {
+    if (!storedTheme()) renderThemeToggle();
+  });
+}
+
+function applyStoredTheme() {
+  const theme = storedTheme();
+  if (theme) document.documentElement.dataset.theme = theme;
+}
+
+function storedTheme() {
+  try {
+    const theme = localStorage.getItem(THEME_STORAGE_KEY);
+    return theme === "light" || theme === "dark" ? theme : "";
+  } catch {
+    return "";
+  }
+}
+
+function resolvedTheme() {
+  const theme = document.documentElement.dataset.theme || storedTheme();
+  if (theme === "light" || theme === "dark") return theme;
+  return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function renderThemeToggle() {
+  const button = document.querySelector(".theme-toggle");
+  const iconSlot = button?.querySelector("[data-theme-icon]");
+  if (!button || !iconSlot) return;
+  const current = resolvedTheme();
+  const nextLabel = current === "dark" ? "切换白天模式" : "切换夜间模式";
+  button.title = nextLabel;
+  button.setAttribute("aria-label", nextLabel);
+  iconSlot.replaceChildren(iconSvg(current === "dark" ? "sun" : "moon"));
 }
 
 function renderTextPreview(container, text, ext) {

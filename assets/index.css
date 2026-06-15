@@ -22,6 +22,16 @@
   }
 }
 
+:root[data-theme="light"] {
+  --border-strong: #b8c2d0;
+  --muted-strong: #425166;
+}
+
+:root[data-theme="dark"] {
+  --border-strong: #465362;
+  --muted-strong: #c0cad4;
+}
+
 .navbar-tools {
   display: flex;
   align-items: center;
@@ -536,10 +546,17 @@
 .toolbar svg,
 .editor-toolbar svg,
 .upload-actions svg,
+.theme-toggle svg,
 .upload-queue-button svg {
   width: 18px;
   height: 18px;
   stroke: currentColor;
+}
+
+.theme-toggle [data-theme-icon] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .icon-lg svg {

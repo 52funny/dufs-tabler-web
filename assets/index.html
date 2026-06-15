@@ -7,6 +7,16 @@
     <meta http-equiv="refresh" content="0; url=?noscript">
   </noscript>
   <title>Dufs Web</title>
+  <script>
+    (() => {
+      try {
+        const theme = localStorage.getItem("dufs-theme");
+        if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
+      } catch {
+        /* Keep the system theme when storage is unavailable. */
+      }
+    })();
+  </script>
   <link rel="icon" type="image/svg+xml" href="__ASSETS_PREFIX__favicon.svg">
   <link rel="stylesheet" href="__ASSETS_PREFIX__tabler.min.css">
   <link rel="stylesheet" href="__ASSETS_PREFIX__index.css">
@@ -21,6 +31,9 @@
         </a>
 
         <div class="navbar-tools">
+          <button class="btn btn-icon btn-outline-secondary theme-toggle" type="button" title="切换夜间模式" aria-label="切换夜间模式">
+            <span data-theme-icon></span>
+          </button>
           <button class="btn btn-outline-secondary upload-queue-button" type="button" title="上传队列">
             <span data-icon="upload"></span>
             <span>上传队列</span>
