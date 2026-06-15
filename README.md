@@ -2,6 +2,12 @@
 
 一个面向 [dufs](https://github.com/sigoden/dufs) 的本地化 Web 界面。所有 HTML、CSS、JS 都在 `assets/` 目录内，Tabler 组件样式也已本地化，不依赖 CDN、远程字体或远程脚本。
 
+## 界面预览
+
+![文件列表界面](docs/screenshots/dufs-desktop.png)
+
+![文件预览界面](docs/screenshots/dufs-preview.png)
+
 ## 使用
 
 ```bash
