@@ -14,9 +14,9 @@
   --tblr-danger-rgb: 214, 57, 57;
   --tblr-success: #2fb344;
   --tblr-warning: #f59f00;
-  --tblr-radius: 4px;
-  --tblr-radius-lg: 6px;
-  --tblr-shadow-card: 0 1px 2px rgba(24, 36, 51, 0.04);
+  --tblr-radius: 8px;
+  --tblr-radius-lg: 10px;
+  --tblr-shadow-card: 0 1px 2px rgba(24, 36, 51, 0.04), 0 1px 3px rgba(24, 36, 51, 0.06);
   --tblr-font-sans-serif: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --tblr-font-monospace: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 }
@@ -36,7 +36,7 @@
     --tblr-primary-rgb: 77, 171, 247;
     --tblr-danger: #ff6b6b;
     --tblr-danger-rgb: 255, 107, 107;
-    --tblr-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.18);
+    --tblr-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.32);
   }
 }
 
@@ -54,9 +54,8 @@
   --tblr-primary-rgb: 32, 107, 196;
   --tblr-danger: #d63939;
   --tblr-danger-rgb: 214, 57, 57;
-  --tblr-shadow-card: 0 1px 2px rgba(24, 36, 51, 0.04);
+  --tblr-shadow-card: 0 1px 2px rgba(24, 36, 51, 0.04), 0 1px 3px rgba(24, 36, 51, 0.06);
 }
-
 :root[data-theme="dark"] {
   color-scheme: dark;
   --tblr-bg-surface: #1a2230;
@@ -71,7 +70,7 @@
   --tblr-primary-rgb: 77, 171, 247;
   --tblr-danger: #ff6b6b;
   --tblr-danger-rgb: 255, 107, 107;
-  --tblr-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.18);
+  --tblr-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.32);
 }
 
 *,

@@ -594,6 +594,7 @@ function renderFileRow(file) {
   const isDir = isDirectory(file);
   const url = fileUrl(file);
   const row = el("tr");
+  row.dataset.kind = fileTypeKind(file);
   row.append(
     el("td", { class: "select-cell" }, selectionInput(file)),
     el("td", { "data-label": "名称" }, el("div", { class: "file-name" }, iconNode(file), fileLink(file, url, isDir))),
@@ -609,6 +610,7 @@ function renderFileCard(file) {
   const isDir = isDirectory(file);
   const url = fileUrl(file);
   const card = el("article", { class: "file-card" });
+  card.dataset.kind = fileTypeKind(file);
   card.append(
     el("div", { class: "select-box" }, selectionInput(file)),
     el("div", { class: "file-card-icon icon-lg" }, iconNode(file, true)),
@@ -1306,6 +1308,19 @@ function fileIconSvg(ext, isDir) {
   if (VIDEO_EXTS.has(ext)) return ICONS.video;
   if (AUDIO_EXTS.has(ext)) return ICONS.music;
   return ICONS.file;
+}
+
+function fileTypeKind(file) {
+  if (isDirectory(file)) return "folder";
+  const ext = extName(file.name);
+  if (IMAGE_EXTS.has(ext)) return "image";
+  if (VIDEO_EXTS.has(ext)) return "video";
+  if (AUDIO_EXTS.has(ext)) return "audio";
+  if (PDF_EXTS.has(ext)) return "pdf";
+  if (ARCHIVE_EXTS.has(ext)) return "archive";
+  if (OFFICE_EXTS.has(ext)) return "office";
+  if (TEXT_PREVIEW_EXTS.has(ext)) return "text";
+  return "file";
 }
 
 function isMediaExt(ext) {
