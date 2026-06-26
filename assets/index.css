@@ -362,8 +362,6 @@ a:focus-visible {
 .segmented .view-toggle.active,
 .segmented .view-toggle.is-active {
   color: var(--primary);
-  background: var(--surface);
-  box-shadow: var(--shadow-sm);
 }
 
 /* ---------- selection bar ---------- */
